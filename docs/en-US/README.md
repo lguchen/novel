@@ -2,10 +2,9 @@
 
 A powerful AI-assisted novel writing platform with memory persistence, multiple AI model integration, and a user-friendly interface.
 
-
-- [中文版本](../zh-CN/README.md)
-- [English Version](../en-US/README.md)
-
+<div align="center">
+  <a href="../zh-CN/README.md">中文版</a> | <a href="../en-US/README.md">English</a>
+</div>
 
 ## Features
 
