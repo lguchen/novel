@@ -35,23 +35,23 @@
             </div>
             
             <div class="action-buttons">
-              <el-button type="primary" @click="setAction('chat')" :class="{ active: currentAction === 'chat' }">
+              <el-button class="action-btn" type="primary" @click="setAction('chat')" :class="{ active: currentAction === 'chat' }">
                 <el-icon><ChatDotRound /></el-icon>
                 对话
               </el-button>
-              <el-button type="success" @click="setAction('continue')" :class="{ active: currentAction === 'continue' }">
+              <el-button class="action-btn" type="success" @click="setAction('continue')" :class="{ active: currentAction === 'continue' }">
                 <el-icon><DocumentAdd /></el-icon>
                 续写
               </el-button>
-              <el-button type="warning" @click="setAction('character')" :class="{ active: currentAction === 'character' }">
+              <el-button class="action-btn" type="warning" @click="setAction('character')" :class="{ active: currentAction === 'character' }">
                 <el-icon><User /></el-icon>
                 角色
               </el-button>
-              <el-button type="info" @click="setAction('plot')" :class="{ active: currentAction === 'plot' }">
+              <el-button class="action-btn" type="info" @click="setAction('plot')" :class="{ active: currentAction === 'plot' }">
                 <el-icon><TrendCharts /></el-icon>
                 剧情
               </el-button>
-              <el-button type="danger" @click="setAction('dialogue')" :class="{ active: currentAction === 'dialogue' }">
+              <el-button class="action-btn" type="danger" @click="setAction('dialogue')" :class="{ active: currentAction === 'dialogue' }">
                 <el-icon><ChatLineSquare /></el-icon>
                 对话生成
               </el-button>
@@ -83,7 +83,8 @@
                     <span class="message-time">{{ message.time }}</span>
                   </div>
                   <div class="message-content">
-                    {{ message.content }}
+                    <div v-if="message.role === 'assistant'" class="markdown-content" v-html="renderMarkdown(message.content)"></div>
+                    <div v-else>{{ message.content }}</div>
                   </div>
                 </div>
               </div>
@@ -93,7 +94,7 @@
                   v-model="userInput"
                   type="textarea"
                   :rows="4"
-                  placeholder="输入你的创作指令或问题..."
+                  :placeholder="inputPlaceholder"
                   @keydown.ctrl.enter="sendMessage"
                 />
                 <div class="input-actions">
@@ -118,6 +119,9 @@ import { useRouter, useRoute } from 'vue-router'
 import { novelApi, agentApi, conversationApi } from '../api'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft, ChatDotRound, DocumentAdd, User, TrendCharts, ChatLineSquare, Promotion, Loading, Warning } from '@element-plus/icons-vue'
+import MarkdownIt from 'markdown-it'
+
+const md = new MarkdownIt()
 
 const router = useRouter()
 const route = useRoute()
@@ -130,8 +134,21 @@ const contextMemory = ref('')
 const loading = ref(false)
 const sending = ref(false)
 const userInput = ref('')
-const currentAction = ref('chat')
+const currentAction = ref('')
 const selectedAgentId = ref(null)
+const isStreaming = ref(false)
+const streamingContent = ref('')
+
+const inputPlaceholder = computed(() => {
+  const actionHints = {
+    chat: '输入你的问题或创作想法...',
+    continue: '输入续写指令，如：继续写下一章...',
+    character: '输入角色相关问题，如：帮我完善主角的性格...',
+    plot: '输入剧情相关问题，如：帮我规划接下来的剧情发展...',
+    dialogue: '输入对话生成指令，如：生成一段主角和配角的对话...'
+  }
+  return actionHints[currentAction.value] || '输入你的创作指令或问题...'
+})
 
 onMounted(async () => {
   await Promise.all([loadNovel(), loadAgents()])
@@ -176,14 +193,10 @@ async function loadConversationHistory() {
 
 function setAction(action) {
   currentAction.value = action
-  const actionHints = {
-    chat: '输入你的问题或创作想法',
-    continue: '输入续写指令，如：继续写下一章',
-    character: '输入角色相关问题，如：帮我完善主角的性格',
-    plot: '输入剧情相关问题，如：帮我规划接下来的剧情发展',
-    dialogue: '输入对话生成指令，如：生成一段主角和配角的对话'
-  }
-  userInput.value = actionHints[action] || ''
+}
+
+function renderMarkdown(content) {
+  return md.render(content)
 }
 
 async function sendMessage() {
@@ -350,16 +363,38 @@ function goBack() {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.action-buttons .el-button {
-  justify-content: flex-start;
+.action-btn {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  transition: all 0.3s ease !important;
+  padding: 12px 16px !important;
+  justify-content: flex-start !important;
 }
 
-.action-buttons .el-button.active {
-  background-color: #667eea;
-  border-color: #667eea;
-  color: white;
+.action-btn:hover {
+  transform: scale(1.02) !important;
+}
+
+.action-btn:active {
+  transform: scale(1.05) !important;
+}
+
+.action-btn.active {
+  background-color: #667eea !important;
+  border-color: #667eea !important;
+  color: white !important;
+  transform: scale(1) !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .agent-selector h4,
@@ -468,5 +503,118 @@ function goBack() {
 .hint {
   font-size: 12px;
   color: #999;
+}
+
+.markdown-content :deep(h1),
+.markdown-content :deep(h2),
+.markdown-content :deep(h3),
+.markdown-content :deep(h4),
+.markdown-content :deep(h5),
+.markdown-content :deep(h6) {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.markdown-content :deep(h1) {
+  font-size: 24px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.markdown-content :deep(h2) {
+  font-size: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 4px;
+}
+
+.markdown-content :deep(h3) {
+  font-size: 18px;
+}
+
+.markdown-content :deep(p) {
+  margin: 8px 0;
+  line-height: 1.8;
+}
+
+.markdown-content :deep(ul),
+.markdown-content :deep(ol) {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+.markdown-content :deep(li) {
+  margin: 4px 0;
+  line-height: 1.6;
+}
+
+.markdown-content :deep(code) {
+  background-color: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+.markdown-content :deep(pre) {
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+
+.markdown-content :deep(pre code) {
+  background-color: transparent;
+  padding: 0;
+}
+
+.markdown-content :deep(blockquote) {
+  border-left: 4px solid #667eea;
+  padding-left: 16px;
+  margin: 8px 0;
+  color: #666;
+  background-color: #f8f9fa;
+  padding: 12px 16px;
+  border-radius: 0 6px 6px 0;
+}
+
+.markdown-content :deep(a) {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.markdown-content :deep(a:hover) {
+  text-decoration: underline;
+}
+
+.markdown-content :deep(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0;
+}
+
+.markdown-content :deep(th),
+.markdown-content :deep(td) {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.markdown-content :deep(th) {
+  background-color: #f5f7fa;
+  font-weight: 600;
+}
+
+.markdown-content :deep(img) {
+  max-width: 100%;
+  border-radius: 6px;
+  margin: 8px 0;
+}
+
+.markdown-content :deep(hr) {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 16px 0;
 }
 </style>
