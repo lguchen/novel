@@ -3,8 +3,11 @@
 This project has pre-configured multiple mainstream AI models, including free and paid models.
 
 
-- [中文版本](../zh-CN/AI_MODEL_CONFIGURATION_GUIDE.md)
-- [English Version](../en-US/AI_MODEL_CONFIGURATION_GUIDE.md)
+<div align="center">
+### 🌐 语言切换
+  <a href="../zh-CN/AI_MODEL_CONFIGURATION_GUIDE.md">中文版</a> | <a href="../en-US/AI_MODEL_CONFIGURATION_GUIDE.md">English</a>
+</div>
+
 
 ## Pre-configured Models
 

@@ -4,6 +4,7 @@
 
 
 <div align="center">
+### 🌐 语言切换
   <a href="docs/zh-CN/README.md">中文版</a> | <a href="docs/en-US/README.md">English</a>
 </div>
 
@@ -126,7 +127,7 @@ novel/
 
 ## AI模型配置
 
-有关AI模型配置的详细信息，请参考 [AI模型配置指南](docs/en-US/AI_MODEL_CONFIGURATION_GUIDE.md)。
+有关AI模型配置的详细信息，请参考 [AI模型配置指南](docs/zh-CN/AI_MODEL_CONFIGURATION_GUIDE.md)。
 
 ## 使用指南
 
