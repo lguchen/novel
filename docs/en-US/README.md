@@ -17,7 +17,7 @@ A powerful AI-assisted novel writing platform with memory persistence, multiple 
    - AI-powered creative inspiration preservation
 
 2. **Custom Skills & Agents**
-   -沉淀创作经验
+   - Accumulate creative experience
    - Build personalized creative agents
    - Adapt to individual creative workflows
 
@@ -65,7 +65,7 @@ A powerful AI-assisted novel writing platform with memory persistence, multiple 
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/lguchen/novel.git
    cd novel
    ```
 
