@@ -80,6 +80,10 @@
             <el-option label="Anthropic" value="anthropic" />
             <el-option label="DeepSeek" value="deepseek" />
             <el-option label="千问" value="qwen" />
+            <el-option label="Ollama" value="ollama" />
+            <el-option label="Groq" value="groq" />
+            <el-option label="Together AI" value="together" />
+            <el-option label="豆包" value="doubao" />
           </el-select>
         </el-form-item>
         <el-form-item label="模型类型">
@@ -92,7 +96,12 @@
           <el-input v-model="currentModel.apiUrl" placeholder="请输入API地址" />
         </el-form-item>
         <el-form-item label="API密钥">
-          <el-input v-model="currentModel.apiKey" type="password" placeholder="请输入API密钥" show-password />
+          <div class="api-key-container">
+            <el-input v-model="currentModel.apiKey" type="password" placeholder="请输入API密钥" show-password />
+            <el-button v-if="getProviderUrl(currentModel.provider)" type="text" @click="openProviderUrl(currentModel.provider)" class="api-key-link">
+              获取API密钥
+            </el-button>
+          </div>
         </el-form-item>
         <el-form-item label="最大Token">
           <el-input-number v-model="currentModel.maxTokens" :min="100" :max="8000" />
@@ -152,9 +161,33 @@ function getModelIcon(provider) {
     openai: '🤖',
     anthropic: '🧠',
     deepseek: '🔮',
-    qwen: '💫'
+    qwen: '💫',
+    ollama: '🏠',
+    groq: '⚡',
+    together: '🤝',
+    doubao: '🐯'
   }
   return icons[provider] || '🎯'
+}
+
+function getProviderUrl(provider) {
+  const urls = {
+    openai: 'https://platform.openai.com/api-keys',
+    anthropic: 'https://console.anthropic.com/settings/keys',
+    deepseek: 'https://platform.deepseek.com/apikeys',
+    qwen: 'https://bailian.console.aliyun.com/cn-beijing/api-key?tab=api#/api',
+    groq: 'https://console.groq.com/playground',
+    together: 'https://api.together.xyz/settings/api-keys',
+    doubao: 'https://www.volcengine.com/product/doubao'
+  }
+  return urls[provider]
+}
+
+function openProviderUrl(provider) {
+  const url = getProviderUrl(provider)
+  if (url) {
+    window.open(url, '_blank')
+  }
 }
 
 function editModel(model) {
@@ -374,5 +407,21 @@ function resetForm() {
 
 .model-actions .el-button {
   flex: 1;
+}
+
+.api-key-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.api-key-container .el-input {
+  flex: 1;
+}
+
+.api-key-link {
+  white-space: nowrap;
+  color: #667eea !important;
+  font-weight: 500;
 }
 </style>
