@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="novel-serve" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="novel-agent" target="17" />
+      <module name="novel-common" target="17" />
+      <module name="novel-create" target="17" />
+      <module name="novel-file" target="17" />
+      <module name="novel-gateway" target="17" />
+      <module name="novel-setting" target="17" />
+      <module name="novel-user" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="novel-agent" options="-parameters" />
+      <module name="novel-common" options="-parameters" />
+      <module name="novel-create" options="-parameters" />
+      <module name="novel-file" options="-parameters" />
+      <module name="novel-gateway" options="-parameters" />
+      <module name="novel-serve" options="-parameters" />
+      <module name="novel-setting" options="-parameters" />
+      <module name="novel-user" options="-parameters" />
+    </option>
+  </component>
+</project>
