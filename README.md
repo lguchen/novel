@@ -3,7 +3,7 @@
 一个功能强大的AI辅助小说创作平台，具有记忆持久化、多AI模型集成和用户友好的界面。
 
 <div align="center">
-   [中文版本](docs/zh-CN/README.md)   |   [English Version](docs/en-US/README.md)
+  <a href="../zh-CN/README.md">中文版</a> | <a href="../en-US/README.md">English</a>
 </div>
 
 
