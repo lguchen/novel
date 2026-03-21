@@ -7,6 +7,7 @@
           <nav class="nav-menu">
             <router-link to="/" class="nav-item">首页</router-link>
             <router-link to="/novels" class="nav-item active">小说管理</router-link>
+            <router-link to="/prompts" class="nav-item">提示词广场</router-link>
             <router-link to="/ai-models" class="nav-item">AI模型配置</router-link>
             <router-link to="/agents" class="nav-item">智能体配置</router-link>
           </nav>
@@ -31,6 +32,10 @@
               返回
             </el-button>
             <div class="header-actions">
+              <el-button @click="showChapters = true">
+                <el-icon><Document /></el-icon>
+                章节管理
+              </el-button>
               <el-button @click="showCharacters = true">
                 <el-icon><User /></el-icon>
                 角色管理
@@ -93,6 +98,8 @@
             />
           </div>
           
+
+          
           <div class="save-actions">
             <el-button type="primary" @click="saveNovel" :loading="saving">
               <el-icon><Check /></el-icon>
@@ -110,6 +117,10 @@
     <el-drawer v-model="showWorldSettings" title="世界观设定" size="40%">
       <WorldSettingManage :novel-id="novelId" />
     </el-drawer>
+    
+    <el-drawer v-model="showChapters" title="章节管理" size="80%">
+      <ChapterManage :novel-id="novelId" />
+    </el-drawer>
   </div>
 </template>
 
@@ -118,9 +129,10 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useNovelStore } from '../stores/novel'
 import { ElMessage } from 'element-plus'
-import { ArrowLeft, User, Grid, ChatDotRound, Check, Loading, Warning } from '@element-plus/icons-vue'
+import { ArrowLeft, User, Grid, ChatDotRound, Check, Loading, Warning, Document } from '@element-plus/icons-vue'
 import CharacterManage from './CharacterManage.vue'
 import WorldSettingManage from './WorldSettingManage.vue'
+import ChapterManage from './ChapterManage.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -130,6 +142,7 @@ const novelId = computed(() => parseInt(route.params.id))
 const novel = ref(null)
 const loading = ref(false)
 const saving = ref(false)
+const showChapters = ref(false)
 const showCharacters = ref(false)
 const showWorldSettings = ref(false)
 

@@ -27,6 +27,8 @@ public class NovelService {
             updatedNovel.setTitle(novel.getTitle());
             updatedNovel.setDescription(novel.getDescription());
             updatedNovel.setGenre(novel.getGenre());
+            updatedNovel.setTargetChapters(novel.getTargetChapters());
+            updatedNovel.setChapterWordCount(novel.getChapterWordCount());
             updatedNovel.setContent(novel.getContent());
             updatedNovel.setContextMemory(novel.getContextMemory());
             updatedNovel.setStyleGuide(novel.getStyleGuide());

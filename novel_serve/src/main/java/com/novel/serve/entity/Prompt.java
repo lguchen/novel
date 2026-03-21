@@ -6,28 +6,16 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "novels")
-public class Novel {
+@Table(name = "prompts")
+public class Prompt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    private String title;
-    private String description;
-    private String genre;
-    private Integer targetChapters;
-    private Integer chapterWordCount;
-    private Integer wordCount = 0;
-    
-    @Column(columnDefinition = "TEXT")
     private String content;
-    
-    @Column(columnDefinition = "TEXT")
-    private String contextMemory;
-    
-    @Column(columnDefinition = "TEXT")
-    private String styleGuide;
-    
+    private String category;
+    private String tags;
+    private Integer usageCount = 0;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     

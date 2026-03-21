@@ -7,6 +7,7 @@
           <nav class="nav-menu">
             <router-link to="/" class="nav-item">首页</router-link>
             <router-link to="/novels" class="nav-item active">小说管理</router-link>
+            <router-link to="/prompts" class="nav-item">提示词广场</router-link>
             <router-link to="/ai-models" class="nav-item">AI模型配置</router-link>
             <router-link to="/agents" class="nav-item">智能体配置</router-link>
           </nav>
@@ -70,13 +71,26 @@
       </el-main>
     </el-container>
     
-    <el-dialog v-model="showCreateDialog" title="创建新小说" width="500px">
-      <el-form :model="newNovel" label-width="80px">
-        <el-form-item label="标题">
-          <el-input v-model="newNovel.title" placeholder="请输入小说标题" />
+    <el-dialog v-model="showCreateDialog" width="500px">
+      <div class="dialog-header">
+        <el-icon><Plus /></el-icon>
+        <h3>创建新的小说项目</h3>
+        <p>设置您的小说基本信息，开始创作之旅</p>
+      </div>
+      <el-form :model="newNovel" label-position="top">
+        <el-form-item required>
+          <label>小说标题</label>
+          <el-input v-model="newNovel.title" placeholder="请输入小说标题" maxlength="100" show-word-limit />
+          <div class="form-hint">当前字数: {{ newNovel.title.length }}/100。标题将作为作品的主要标识。</div>
         </el-form-item>
-        <el-form-item label="类型">
-          <el-select v-model="newNovel.genre" placeholder="请选择小说类型">
+        <el-form-item>
+          <label>小说简介</label>
+          <el-input v-model="newNovel.description" type="textarea" :rows="4" placeholder="请简要描述您的小说内容、背景设定和主要情节..." maxlength="500" show-word-limit />
+          <div class="form-hint">当前字数: {{ newNovel.description.length }}/500。简介将帮助读者快速了解您的作品。</div>
+        </el-form-item>
+        <el-form-item required>
+          <label>小说类型</label>
+          <el-select v-model="newNovel.genre" placeholder="请选择类型" style="width: 100%">
             <el-option label="玄幻" value="玄幻" />
             <el-option label="都市" value="都市" />
             <el-option label="科幻" value="科幻" />
@@ -85,14 +99,22 @@
             <el-option label="历史" value="历史" />
             <el-option label="其他" value="其他" />
           </el-select>
+          <div class="form-hint">选择最符合作品风格的类型</div>
         </el-form-item>
-        <el-form-item label="描述">
-          <el-input v-model="newNovel.description" type="textarea" :rows="4" placeholder="请输入小说描述" />
+        <el-form-item required>
+          <label>目标章节数</label>
+          <el-input v-model="newNovel.targetChapters" type="number" placeholder="如：20" min="1" max="100" />
+          <div class="form-hint">建议10-100章，创建后可调整</div>
+        </el-form-item>
+        <el-form-item required>
+          <label>每章节字数</label>
+          <el-input v-model="newNovel.chapterWordCount" type="number" placeholder="如：3000" min="500" max="20000" />
+          <div class="form-hint">建议500-20000字，创建后可调整</div>
         </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="showCreateDialog = false">取消</el-button>
-        <el-button type="primary" @click="handleCreateNovel" :loading="creating">创建</el-button>
+        <el-button type="primary" @click="handleCreateNovel" :loading="creating">创建项目</el-button>
       </template>
     </el-dialog>
   </div>
@@ -115,8 +137,10 @@ const showCreateDialog = ref(false)
 const creating = ref(false)
 const newNovel = ref({
   title: '',
+  description: '',
   genre: '',
-  description: ''
+  targetChapters: '',
+  chapterWordCount: ''
 })
 
 onMounted(async () => {
@@ -143,13 +167,28 @@ async function handleCreateNovel() {
     return
   }
   
+  if (!newNovel.value.genre) {
+    ElMessage.warning('请选择小说类型')
+    return
+  }
+  
+  if (!newNovel.value.targetChapters || newNovel.value.targetChapters < 1 || newNovel.value.targetChapters > 100) {
+    ElMessage.warning('请输入有效的目标章节数（1-100）')
+    return
+  }
+  
+  if (!newNovel.value.chapterWordCount || newNovel.value.chapterWordCount < 500 || newNovel.value.chapterWordCount > 20000) {
+    ElMessage.warning('请输入有效的每章节字数（500-20000）')
+    return
+  }
+  
   creating.value = true
   try {
     const createdNovel = await novelStore.createNovel(newNovel.value)
     if (createdNovel) {
       ElMessage.success('小说创建成功')
       showCreateDialog.value = false
-      newNovel.value = { title: '', genre: '', description: '' }
+      newNovel.value = { title: '', description: '', genre: '', targetChapters: '', chapterWordCount: '' }
       await loadNovels()
     }
   } catch (err) {
@@ -351,5 +390,49 @@ function confirmDelete(novel) {
 
 .novel-actions .el-button {
   flex: 1;
+}
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dialog-header el-icon {
+  font-size: 24px;
+  color: #667eea;
+}
+
+.dialog-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.dialog-header p {
+  margin: 0;
+  font-size: 14px;
+  color: #999;
+  flex: 1;
+}
+
+.form-hint {
+  font-size: 12px;
+  color: #999;
+  margin-top: 5px;
+}
+
+.el-form-item {
+  margin-bottom: 20px;
+}
+
+.el-form-item label {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+  display: block;
 }
 </style>

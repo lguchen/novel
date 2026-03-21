@@ -7,6 +7,7 @@
           <nav class="nav-menu">
             <router-link to="/" class="nav-item">首页</router-link>
             <router-link to="/novels" class="nav-item">小说管理</router-link>
+            <router-link to="/prompts" class="nav-item">提示词广场</router-link>
             <router-link to="/ai-models" class="nav-item">AI模型配置</router-link>
             <router-link to="/agents" class="nav-item">智能体配置</router-link>
           </nav>
