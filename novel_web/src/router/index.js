@@ -7,6 +7,7 @@ import WorldSettingManage from '../views/WorldSettingManage.vue'
 import AIModelConfig from '../views/AIModelConfig.vue'
 import AgentConfig from '../views/AgentConfig.vue'
 import Conversation from '../views/Conversation.vue'
+import PromptSquare from '../views/PromptSquare.vue'
 
 const routes = [
   {
@@ -48,6 +49,11 @@ const routes = [
     path: '/conversation/:id',
     name: 'Conversation',
     component: Conversation
+  },
+  {
+    path: '/prompts',
+    name: 'PromptSquare',
+    component: PromptSquare
   }
 ]
 

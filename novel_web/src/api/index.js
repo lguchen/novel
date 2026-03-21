@@ -184,4 +184,78 @@ export const conversationApi = {
   }
 }
 
+export const chapterApi = {
+  getAllByNovelId(novelId) {
+    return api.get(`/chapters/novel/${novelId}`)
+  },
+  
+  getById(id) {
+    return api.get(`/chapters/${id}`)
+  },
+  
+  create(chapter) {
+    return api.post('/chapters', chapter)
+  },
+  
+  update(id, chapter) {
+    return api.put(`/chapters/${id}`, chapter)
+  },
+  
+  delete(id) {
+    return api.delete(`/chapters/${id}`)
+  },
+  
+  appendContent(id, content) {
+    return api.post(`/chapters/${id}/content`, content, {
+      headers: { 'Content-Type': 'text/plain' }
+    })
+  },
+  
+  getNextChapterNumber(novelId) {
+    return api.get(`/chapters/novel/${novelId}/next-chapter-number`)
+  }
+}
+
+export const promptApi = {
+  getAll() {
+    return api.get('/prompts')
+  },
+  
+  getById(id) {
+    return api.get(`/prompts/${id}`)
+  },
+  
+  create(prompt) {
+    return api.post('/prompts', prompt)
+  },
+  
+  update(id, prompt) {
+    return api.put(`/prompts/${id}`, prompt)
+  },
+  
+  delete(id) {
+    return api.delete(`/prompts/${id}`)
+  },
+  
+  getByCategory(category) {
+    return api.get(`/prompts/category/${category}`)
+  },
+  
+  getByTag(tag) {
+    return api.get(`/prompts/tag/${tag}`)
+  },
+  
+  search(keyword) {
+    return api.get(`/prompts/search/${keyword}`)
+  },
+  
+  getPopular() {
+    return api.get('/prompts/popular')
+  },
+  
+  incrementUsageCount(id) {
+    return api.post(`/prompts/${id}/usage`)
+  }
+}
+
 export default api

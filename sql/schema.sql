@@ -103,3 +103,32 @@ CREATE TABLE IF NOT EXISTS conversation_history (
     FOREIGN KEY (novel_id) REFERENCES novels(id) ON DELETE CASCADE,
     FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Create prompts table
+CREATE TABLE IF NOT EXISTS prompts (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    content TEXT NOT NULL,
+    category VARCHAR(100),
+    tags VARCHAR(255),
+    usage_count INT DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_category (category),
+    INDEX idx_tags (tags),
+    INDEX idx_usage_count (usage_count)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Create chapters table
+CREATE TABLE IF NOT EXISTS chapters (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    novel_id BIGINT,
+    title VARCHAR(255) NOT NULL,
+    chapter_number INT,
+    content LONGTEXT,
+    word_count INT DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_novel_id (novel_id),
+    INDEX idx_chapter_number (chapter_number),
+    FOREIGN KEY (novel_id) REFERENCES novels(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
