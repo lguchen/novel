@@ -86,16 +86,24 @@
             <div class="section-header">
               <h3>小说内容</h3>
               <div class="content-stats">
-                <span>{{ novel.wordCount }} 字</span>
+                <span>{{ totalWordCount }} 字</span>
+                <span v-if="chapters.length > 0">{{ chapters.length }} 章</span>
               </div>
             </div>
-            <el-input
-              v-model="novel.content"
-              type="textarea"
-              :rows="20"
-              placeholder="开始创作你的小说..."
-              class="content-editor"
-            />
+            <div v-if="loadingChapters" class="loading-container">
+              <el-icon class="is-loading"><Loading /></el-icon>
+              <span>加载章节中...</span>
+            </div>
+            <div v-else-if="chapters.length === 0" class="empty-content">
+              <el-empty description="暂无章节内容，请点击章节管理添加章节" />
+            </div>
+            <div v-else class="document-view">
+              <div v-for="chapter in chapters" :key="chapter.id" class="chapter-content">
+                <h4 class="chapter-title">第{{ chapter.chapterNumber }}章 {{ chapter.title }}</h4>
+                <div class="chapter-body" v-html="formatChapterContent(chapter.content)"></div>
+                <hr class="chapter-divider" />
+              </div>
+            </div>
           </div>
           
 
@@ -125,7 +133,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useNovelStore } from '../stores/novel'
 import { ElMessage } from 'element-plus'
@@ -133,6 +141,7 @@ import { ArrowLeft, User, Grid, ChatDotRound, Check, Loading, Warning, Document 
 import CharacterManage from './CharacterManage.vue'
 import WorldSettingManage from './WorldSettingManage.vue'
 import ChapterManage from './ChapterManage.vue'
+import { chapterApi, characterApi } from '../api'
 
 const router = useRouter()
 const route = useRoute()
@@ -140,14 +149,20 @@ const novelStore = useNovelStore()
 
 const novelId = computed(() => parseInt(route.params.id))
 const novel = ref(null)
+const chapters = ref([])
+const characters = ref([])
 const loading = ref(false)
 const saving = ref(false)
+const loadingChapters = ref(false)
+const loadingCharacters = ref(false)
 const showChapters = ref(false)
 const showCharacters = ref(false)
 const showWorldSettings = ref(false)
 
 onMounted(async () => {
   await loadNovel()
+  await loadChapters()
+  await loadCharacters()
 })
 
 async function loadNovel() {
@@ -160,6 +175,46 @@ async function loadNovel() {
     loading.value = false
   }
 }
+
+async function loadChapters() {
+  loadingChapters.value = true
+  try {
+    chapters.value = await chapterApi.getAllByNovelId(novelId.value)
+    // 按章节号排序
+    chapters.value.sort((a, b) => a.chapterNumber - b.chapterNumber)
+  } catch (err) {
+    ElMessage.error('加载章节失败')
+  } finally {
+    loadingChapters.value = false
+  }
+}
+
+async function loadCharacters() {
+  loadingCharacters.value = true
+  try {
+    characters.value = await characterApi.getByNovelId(novelId.value)
+  } catch (err) {
+    ElMessage.error('加载角色失败')
+  } finally {
+    loadingCharacters.value = false
+  }
+}
+
+// 监听章节管理抽屉关闭事件
+watch(showChapters, async (newVal) => {
+  if (!newVal) {
+    // 抽屉关闭时重新加载章节数据
+    await loadChapters()
+  }
+})
+
+// 监听角色管理抽屉关闭事件
+watch(showCharacters, async (newVal) => {
+  if (!newVal) {
+    // 抽屉关闭时重新加载角色数据
+    await loadCharacters()
+  }
+})
 
 async function saveNovel() {
   saving.value = true
@@ -181,6 +236,29 @@ function goBack() {
 
 function startConversation() {
   router.push(`/conversation/${novelId.value}`)
+}
+
+// 计算总字数
+const totalWordCount = computed(() => {
+  return chapters.value.reduce((total, chapter) => total + (chapter.wordCount || 0), 0)
+})
+
+// 格式化章节内容，将换行符转换为HTML换行标签，并高亮显示角色名字
+function formatChapterContent(content) {
+  if (!content) return ''
+  
+  let formattedContent = content.replace(/\n/g, '<br>')
+  
+  // 高亮显示角色名字
+  characters.value.forEach(character => {
+    if (character.name && character.color) {
+      // 使用正则表达式匹配角色名字，确保是完整的词
+      const regex = new RegExp(`\\b${character.name}\\b`, 'g')
+      formattedContent = formattedContent.replace(regex, `<span style="color: ${character.color}; font-weight: bold;">${character.name}</span>`)
+    }
+  })
+  
+  return formattedContent
 }
 </script>
 
@@ -306,6 +384,49 @@ function startConversation() {
   font-family: 'Courier New', monospace;
   font-size: 14px;
   line-height: 1.8;
+}
+
+.document-view {
+  background-color: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 30px;
+  min-height: 400px;
+  max-height: 600px;
+  overflow-y: auto;
+  font-family: 'SimSun', '宋体', serif;
+}
+
+.chapter-content {
+  margin-bottom: 30px;
+}
+
+.chapter-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.chapter-body {
+  font-size: 16px;
+  line-height: 2.0;
+  color: #333;
+  text-align: justify;
+  margin-bottom: 20px;
+}
+
+.chapter-divider {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #ccc, transparent);
+  margin: 30px 0;
+}
+
+.empty-content {
+  padding: 60px 20px;
+  text-align: center;
 }
 
 .save-actions {

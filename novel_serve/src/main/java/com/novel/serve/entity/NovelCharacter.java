@@ -15,6 +15,7 @@ public class NovelCharacter {
     private String name;
     private String role;
     private String personality;
+    private String color;
     
     @Column(columnDefinition = "TEXT")
     private String background;

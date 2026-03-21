@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS characters (
     name VARCHAR(255) NOT NULL,
     role VARCHAR(100),
     personality TEXT,
+    color VARCHAR(20),
     background TEXT,
     appearance TEXT,
     relationships TEXT,

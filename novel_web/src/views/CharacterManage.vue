@@ -24,9 +24,12 @@
         </div>
         <div class="character-details">
           <div class="character-name">
+          <div class="character-name-content">
             <h4>{{ character.name }}</h4>
-            <el-tag size="small">{{ character.role || '未设定' }}</el-tag>
+            <div v-if="character.color" class="character-color-preview" :style="{ backgroundColor: character.color }"></div>
           </div>
+          <el-tag size="small">{{ character.role || '未设定' }}</el-tag>
+        </div>
           <div class="character-info">
             <p v-if="character.personality"><strong>性格:</strong> {{ character.personality }}</p>
             <p v-if="character.background"><strong>背景:</strong> {{ character.background }}</p>
@@ -67,6 +70,10 @@
         <el-form-item label="人物关系">
           <el-input v-model="currentCharacter.relationships" type="textarea" :rows="3" placeholder="请描述角色与其他人物的关系" />
         </el-form-item>
+        <el-form-item label="高亮颜色">
+          <el-color-picker v-model="currentCharacter.color" show-alpha />
+          <div class="form-hint">选择角色在小说内容中的高亮颜色</div>
+        </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="showCreateDialog = false">取消</el-button>
@@ -101,6 +108,7 @@ const currentCharacter = ref({
   background: '',
   appearance: '',
   relationships: '',
+  color: '',
   novelId: props.novelId
 })
 
@@ -181,6 +189,7 @@ function resetForm() {
     background: '',
     appearance: '',
     relationships: '',
+    color: '',
     novelId: props.novelId
   }
 }
@@ -262,10 +271,29 @@ function resetForm() {
   margin-bottom: 10px;
 }
 
+.character-name-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .character-name h4 {
   margin: 0;
   color: #333;
   font-size: 16px;
+}
+
+.character-color-preview {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+}
+
+.form-hint {
+  font-size: 12px;
+  color: #999;
+  margin-top: 5px;
 }
 
 .character-info {
