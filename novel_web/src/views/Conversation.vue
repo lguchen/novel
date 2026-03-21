@@ -76,18 +76,27 @@
           
           <div class="conversation-main">
             <div class="chat-container">
-              <div class="chat-messages">
-                <div v-for="(message, index) in messages" :key="index" :class="['message', message.role]">
-                  <div class="message-header">
-                    <span class="message-role">{{ message.role === 'user' ? '你' : 'AI助手' }}</span>
-                    <span class="message-time">{{ message.time }}</span>
+              <div class="chat-messages" ref="chatMessagesRef">
+                    <div v-for="(message, index) in messages" :key="index" :class="['message', message.role]">
+                      <div class="message-header">
+                        <span class="message-role">{{ message.role === 'user' ? '你' : 'AI助手' }}</span>
+                        <span class="message-time">{{ message.time }}</span>
+                      </div>
+                      <div class="message-content">
+                        <div v-if="message.role === 'assistant'" class="markdown-content" v-html="renderMarkdown(message.content)"></div>
+                        <div v-else>{{ message.content }}</div>
+                      </div>
+                    </div>
+                    <div v-if="isStreaming" class="message assistant">
+                      <div class="message-header">
+                        <span class="message-role">AI助手</span>
+                        <span class="message-time">{{ formatTime(new Date()) }}</span>
+                      </div>
+                      <div class="message-content">
+                        <div class="markdown-content" v-html="renderMarkdown(streamingContent)"></div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="message-content">
-                    <div v-if="message.role === 'assistant'" class="markdown-content" v-html="renderMarkdown(message.content)"></div>
-                    <div v-else>{{ message.content }}</div>
-                  </div>
-                </div>
-              </div>
               
               <div class="chat-input">
                 <el-input
@@ -95,10 +104,10 @@
                   type="textarea"
                   :rows="4"
                   :placeholder="inputPlaceholder"
-                  @keydown.ctrl.enter="sendMessage"
+                  @keydown.enter.prevent="sendMessage"
                 />
                 <div class="input-actions">
-                  <span class="hint">按 Ctrl+Enter 发送</span>
+                  <span class="hint">按 Enter 发送</span>
                   <el-button type="primary" @click="sendMessage" :loading="sending">
                     <el-icon><Promotion /></el-icon>
                     发送
@@ -138,6 +147,7 @@ const currentAction = ref('')
 const selectedAgentId = ref(null)
 const isStreaming = ref(false)
 const streamingContent = ref('')
+const chatMessagesRef = ref(null)
 
 const inputPlaceholder = computed(() => {
   const actionHints = {
@@ -199,6 +209,14 @@ function renderMarkdown(content) {
   return md.render(content)
 }
 
+function scrollToBottom() {
+  setTimeout(() => {
+    if (chatMessagesRef.value) {
+      chatMessagesRef.value.scrollTop = chatMessagesRef.value.scrollHeight
+    }
+  }, 100)
+}
+
 async function sendMessage() {
   if (!userInput.value.trim()) {
     ElMessage.warning('请输入内容')
@@ -220,7 +238,15 @@ async function sendMessage() {
   userInput.value = ''
   sending.value = true
   
+  // 自动滚动到底部
+  scrollToBottom()
+  
   try {
+    // 模拟流式输出
+    isStreaming.value = true
+    streamingContent.value = ''
+    
+    // 先发送请求
     const response = await conversationApi.chat({
       novelId: novelId.value,
       agentId: selectedAgentId.value,
@@ -232,22 +258,42 @@ async function sendMessage() {
       ElMessage.error(response.error)
       messages.value.pop()
     } else {
-      messages.value.push({
-        role: 'assistant',
-        content: response.response,
-        time: formatTime(new Date())
-      })
-      
-      if (response.novel) {
-        novel.value = response.novel
-        contextMemory.value = response.contextMemory
-      }
-      
-      ElMessage.success('AI回复成功')
+      // 模拟流式输出效果
+      const fullContent = response.response
+      let index = 0
+      const interval = setInterval(() => {
+        if (index < fullContent.length) {
+          // 每次添加几个字符
+          const chunkSize = Math.min(5, fullContent.length - index)
+          streamingContent.value += fullContent.substring(index, index + chunkSize)
+          index += chunkSize
+          // 自动滚动
+          scrollToBottom()
+        } else {
+          clearInterval(interval)
+          // 完成流式输出
+          isStreaming.value = false
+          messages.value.push({
+            role: 'assistant',
+            content: fullContent,
+            time: formatTime(new Date())
+          })
+          
+          if (response.novel) {
+            novel.value = response.novel
+            contextMemory.value = response.contextMemory
+          }
+          
+          ElMessage.success('AI回复成功')
+          // 自动滚动
+          scrollToBottom()
+        }
+      }, 50) // 每50毫秒添加一次内容
     }
   } catch (err) {
     ElMessage.error('发送失败')
     messages.value.pop()
+    isStreaming.value = false
   } finally {
     sending.value = false
   }
