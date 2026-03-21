@@ -504,9 +504,11 @@ function goBack() {
 
 .message {
   max-width: 80%;
-  padding: 12px 16px;
+  padding: 10px 14px !important;
   border-radius: 12px;
   animation: fadeIn 0.3s ease-in;
+  margin: 6px 0 !important;
+  box-sizing: border-box !important;
 }
 
 @keyframes fadeIn {
@@ -536,14 +538,18 @@ function goBack() {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 4px !important;
   font-size: 12px;
   opacity: 0.8;
+  padding: 0 !important;
 }
 
 .message-content {
-  line-height: 1.6;
+  line-height: 1.6 !important;
   white-space: pre-wrap;
+  padding: 0 !important;
+  margin: 0 !important;
+  min-height: 16px;
 }
 
 .chat-input {
@@ -592,19 +598,22 @@ function goBack() {
 }
 
 .markdown-content :deep(p) {
-  margin: 8px 0;
-  line-height: 1.8;
+  margin: 4px 0 !important;
+  line-height: 1.6 !important;
+  padding: 0 !important;
 }
 
 .markdown-content :deep(ul),
 .markdown-content :deep(ol) {
-  margin: 8px 0;
-  padding-left: 24px;
+  margin: 6px 0 !important;
+  padding-left: 24px !important;
+  line-height: 1.6 !important;
 }
 
 .markdown-content :deep(li) {
-  margin: 4px 0;
-  line-height: 1.6;
+  margin: 2px 0 !important;
+  line-height: 1.6 !important;
+  padding: 0 !important;
 }
 
 .markdown-content :deep(code) {
