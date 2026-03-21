@@ -4,8 +4,8 @@
 
 
 <div align="center">
-### 🌐 语言切换
-  <a href="../zh-CN/README.md">中文版</a> | <a href="../en-US/README.md">English</a>
+   <h2>🌐 语言切换<h2>
+   <a href="../zh-CN/README.md">中文版</a> | <a href="../en-US/README.md">English</a>
 </div>
 
 
