@@ -362,10 +362,12 @@ function goBack() {
 .action-buttons {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   overflow: hidden;
   box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
 .action-btn {
@@ -374,8 +376,19 @@ function goBack() {
   max-width: 100% !important;
   box-sizing: border-box !important;
   transition: all 0.3s ease !important;
-  padding: 12px 16px !important;
-  justify-content: flex-start !important;
+  padding: 10px 14px !important;
+  justify-content: center !important;
+  text-align: center !important;
+  margin: 0 !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  height: 48px !important;
+  line-height: 24px !important;
+}
+
+.action-btn .el-icon {
+  margin-right: 8px !important;
+  font-size: 16px !important;
 }
 
 .action-btn:hover {
