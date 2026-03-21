@@ -6,11 +6,12 @@ spring:
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:schema.sql,classpath:agents_data.sql
-      encoding: UTF-8
+#此项是启动项目自动加载sql文件到数据库，开启此项请把sql文件放到resources目录下
+#  sql:
+#    init:
+#      mode: always
+#      schema-locations: classpath:schema.sql,classpath:agents_data.sql,classpath:data.sql
+#      encoding: UTF-8
   jpa:
     hibernate:
       ddl-auto: update
